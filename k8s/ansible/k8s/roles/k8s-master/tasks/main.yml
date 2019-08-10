@@ -1,0 +1,44 @@
+---
+# Set up k8s
+
+- name: Initialize the cluster using the IP range for Flannel.
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16 --node-name k8s-master
+
+- name: Create kube config directory
+  file:
+    path: /home/k8suser/.kube
+    state: directory
+    owner: k8suser
+    group: k8suser
+
+- name: Copy config to local folder
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/k8suser/.kube/config
+    backup: yes
+    remote_src: yes
+
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+
+- name: Debug
+  debug:
+    msg: Join command {{ join_command.stdout_lines[0] }}
+
+- name: Copy join command to local file
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="/data/devops/join-command.sh"
+
+- name: Deploy Flannel
+  command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  become: true
+  become_user: k8suser
+
+- name: Wait for all containers
+  shell: kubectl get pods --all-namespaces | wc -l
+  register: result
+  until: result.stdout.find("9") != -1
+  retries: 60
+  delay: 10
+  become: true
+  become_user: k8suser

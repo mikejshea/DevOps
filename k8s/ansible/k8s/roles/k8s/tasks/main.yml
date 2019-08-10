@@ -1,0 +1,75 @@
+---
+# Set up k8s
+
+# modprobe br_netfilter
+# echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+- name: Enable the br_netfilter module for cluster communication
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Enable the br_netfilter module for cluster communication, part 2
+  shell: echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+ # swapoff -a
+ # vim /etc/fstab.orig  ->  Comment out the swap line
+- name: Disable swap to prevent memory allocation issues.
+  shell: |
+      swapoff -a
+
+- name: Disable SWAP in fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^(.+?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+
+- name: Install the Docker prerequisites.
+  yum:
+    name:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+    state: present
+
+- name: Add the Docker repo
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+- name: Install Docker
+  yum:
+    name:
+      - docker-ce-18.09.8
+
+- name: Configure the Docker Cgroup Driver to systemd
+  shell: sed -i '/^ExecStart/ s/$/ --exec-opt native.cgroupdriver=systemd/' /usr/lib/systemd/system/docker.service
+
+- name: Enable and Start Docker
+  systemd:
+    state: started
+    daemon_reload: yes
+    name: docker
+    enabled: yes
+
+- name: Add the Kubernetes repo.
+  yum_repository:
+    name: Kubernetes
+    description: Kubernetes
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    enabled: yes
+    gpgcheck: no
+    repo_gpgcheck: no
+    gpgkey: 'https://packages.cloud.google.com/yum/doc/yum-key.gpg\nhttps://packages.cloud.google.com/yum/doc/rpm-package-key.gpg'
+
+- name: Install Kubernetes.
+  yum:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+
+- name: Enable Kubernetes. The kubelet service will not start until you run kubeadm init.
+  systemd:
+    state: started
+    daemon_reload: yes
+    name: kubelet
+    enabled: yes

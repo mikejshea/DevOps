@@ -1,0 +1,5 @@
+---
+# Set up k8s nodes
+
+- name: Join cluster
+  script: /data/devops/join-command.sh

@@ -1,0 +1,8 @@
+---
+# main
+# The playbook runs yum update, disables selinux and installs nano
+
+- hosts: all
+  remote_user: root
+  roles:
+    - role: k8s
