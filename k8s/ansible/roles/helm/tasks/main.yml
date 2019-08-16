@@ -1,0 +1,54 @@
+---
+# Install Helm and Tiller
+
+- name: Download Helm
+  get_url:
+    url: https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz
+    dest: /home/k8suser/helm.tar.gz
+    checksum: sha256:38614a665859c0f01c9c1d84fa9a5027364f936814d1e47839b05327e400bf55
+
+- name: Make directory for unarchive
+  file:
+    path: /home/k8suser/helm/
+    state: directory
+
+- name: Extract helm.tar.gz into /home/k8suser/helm
+  unarchive:
+    src: /home/k8suser/helm.tar.gz
+    dest: /home/k8suser/helm
+    remote_src: yes
+
+- name: Copy helm to /usr/local/bin/
+  copy:
+    src: /home/k8suser/helm/linux-amd64/helm
+    dest: /usr/local/bin/helm
+    remote_src: yes
+
+- name: Make helm executable
+  file:
+    dest: /usr/local/bin/helm
+    mode: a+x
+
+- name: Remove helm download
+  file:
+    path: /home/k8suser/helm.tar.gz
+    state: absent
+
+- name: Remove helm folder
+  file:
+    path: /home/k8suser/helm
+    state: absent
+
+- name: Init Helm
+  shell: /usr/local/bin/helm init
+  become: true
+  become_user: k8suser
+
+- name: Wait for all operator containers
+  shell: kubectl get pods --all-namespaces | grep "tiller.*Running" | wc -l
+  register: result
+  until: result.stdout.find("1") != -1
+  retries: 20
+  delay: 30
+  become: true
+  become_user: k8suser

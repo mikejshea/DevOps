@@ -1,0 +1,8 @@
+---
+# main
+# The playbook sets up rook_ceph
+
+- hosts: master
+  remote_user: root
+  roles:
+    - role: helm

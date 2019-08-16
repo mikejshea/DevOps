@@ -35,9 +35,9 @@
   become_user: k8suser
 
 - name: Wait for all containers
-  shell: kubectl get pods --all-namespaces | wc -l
+  shell: kubectl get pods --all-namespaces | grep Running | wc -l
   register: result
-  until: result.stdout.find("9") != -1
+  until: result.stdout.find("8") != -1
   retries: 60
   delay: 10
   become: true

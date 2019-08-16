@@ -1,0 +1,63 @@
+---
+# Set up rook with ceph
+- set_fact:
+     ceph_path: /home/k8suser/rook/cluster/examples/kubernetes/ceph
+
+- name: Install git
+  yum:
+    name: git
+    state: latest
+
+- name: Get git repository
+  git:
+    repo: 'https://github.com/rook/rook.git'
+    dest: /home/k8suser/rook
+    version: remotes/origin/release-0.9
+
+- name: Create Rook Ceph Operator
+  shell: kubectl create -f operator.yaml
+  args:
+    chdir: '{{ ceph_path }}'
+  become: true
+  become_user: k8suser
+
+- name: Wait for all operator containers
+  shell: kubectl -n rook-ceph-system get pods | grep Running | wc -l
+  register: result
+  until: result.stdout.find("5") != -1
+  retries: 20
+  delay: 30
+  become: true
+  become_user: k8suser
+
+- name: Create Rook Ceph Cluster
+  shell: kubectl create -f cluster.yaml
+  args:
+    chdir: '{{ ceph_path }}'
+  become: true
+  become_user: k8suser
+
+- name: Wait for all cluster containers to be running
+  shell: kubectl -n rook-ceph get pods | grep Running | wc -l
+  register: result
+  until: result.stdout.find("6") != -1
+  retries: 20
+  delay: 30
+  become: true
+  become_user: k8suser
+
+- name: Wait for all cluster containers to be completed
+  shell: kubectl -n rook-ceph get pods | grep Completed | wc -l
+  register: result
+  until: result.stdout.find("2") != -1
+  retries: 20
+  delay: 30
+  become: true
+  become_user: k8suser
+
+- name: Create Rook Ceph Storage Class
+  shell: kubectl create -f storageclass.yaml
+  args:
+    chdir: '{{ ceph_path }}'
+  become: true
+  become_user: k8suser
