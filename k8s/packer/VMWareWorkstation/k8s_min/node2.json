@@ -1,0 +1,9 @@
+{
+  "vm_name": "k8s-node2",
+  "output_directory": "D:\\VMs\\k8s\\k8s-node2\\",
+  "ens33_source": "networking\\k8s-node2.txt",
+  "disk_size": "30720",
+  "disk_additional_size": "61440",
+  "numvcpus": "2",
+  "memsize": "4096"
+}
