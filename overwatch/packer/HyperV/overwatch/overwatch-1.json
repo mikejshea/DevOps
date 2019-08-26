@@ -1,6 +1,6 @@
 {
   "vm_name": "overwatch-1",
-  "output_directory": "D:\\VMs\\overwatch\\overwatch-1\\",
+  "output_directory": "C:\\source\\VMs\\overwatch\\overwatch-1\\",
   "ens33_source": "networking\\overwatch-1.txt",
   "disk_size": "30720",
   "disk_additional_size": "61440",

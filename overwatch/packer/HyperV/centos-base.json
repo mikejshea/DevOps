@@ -1,50 +1,44 @@
 {
   "variables": {
-    "iso_file": "../CentOS-7-x86_64-Minimal-1810.iso",
+    "iso_file": "C:\\source\\iso\\CentOS-7-x86_64-Minimal-1810.iso",
     "iso_checksum_value": "38d5d51d9d100fd73df031ffd6bd8b1297ce24660dc8c13a3b8b4534a4bd291c",
     "product_name": "CentOS",
     "product_version": "7.0.1810",
     "product_arch": "amd64",
     "headless": "false",
-    "ssh_password": "overwatch",
-    "ssh_wait_timeout": "10m",
+    "ssh_password": "devops",
+    "ssh_wait_timeout": "20m",
     "shutdown_command": "shutdown -P now"
   },
   "builders": [
     {
       "vm_name": "{{user `vm_name`}}",
-      "vmdk_name": "{{user `vm_name`}}",
-      "type": "vmware-iso",
+      "temp_path": ".",
+      "type": "hyperv-iso",
       "headless": "{{user `headless`}}",
       "disk_size": "{{user `disk_size`}}",
-      "disk_type_id": 0,
-      "guest_os_type": "centos-64",
       "iso_url": "{{user `iso_file`}}",
       "iso_checksum": "{{user `iso_checksum_value`}}",
       "iso_checksum_type": "sha256",
       "output_directory": "{{user `output_directory`}}",
       "ssh_username": "root",
       "ssh_password": "{{user `ssh_password`}}",
-      "ssh_wait_timeout": "{{user `ssh_wait_timeout`}}",
+      "ssh_timeout": "20m",
       "shutdown_command": "{{user `shutdown_command`}}",
+      "communicator": "ssh",
       "http_directory": "http",
-      "vmx_data": {
-        "cpuid.coresPerSocket": "2",
-        "memsize": "{{user `memsize`}}",
-        "numvcpus": "{{user `numvcpus`}}",
-        "virtualhw.version": "15"
-      },
-      "vmx_data_post":
-      {
-        "ethernet0.present":"TRUE",
-        "ethernet0.connectionType":"bridged",
-        "ethernet0.virtualDev":"e1000",
-        "ethernet0.wakeOnPcktRcv":"FALSE",
-        "ethernet0.addressType":"generated"
-      },
+      "cpus": "{{user `numvcpus`}}",
+      "memory": "{{user `memsize`}}",
+      "enable_dynamic_memory": "true",
+      "switch_name": "External",
+      "generation": 2,
+      "guest_additions_mode": "disabled",
+      "boot_wait": "10s",
       "boot_command": [
-        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
-      ]
+        "c  setparams 'kickstart' <enter> linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=CentOS\\x207\\x20x\\86_64 inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter> initrdefi /images/pxeboot/initrd.img<enter> boot<enter>"
+      ],
+      "guest_additions_mode": "disable",
+      "enable_secure_boot": false
     }
   ],
   "provisioners": [
