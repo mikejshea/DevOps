@@ -14,5 +14,5 @@ yum install -y ansible
 sudo mkdir -p /data/devops
 sudo chown -R overwatch:overwatch /data
 
-echo "sudo /usr/bin/vmhgfs-fuse .host:/overwatch /data/devops -o subtype=vmhgfs-fuse,allow_other" >> /home/overwatch/shared_folder.sh
+echo "sudo /usr/bin/vmhgfs-fuse .host:/devops /data/devops -o subtype=vmhgfs-fuse,allow_other" >> /home/overwatch/shared_folder.sh
 chmod +x /home/overwatch/shared_folder.sh
