@@ -1,0 +1,10 @@
+{
+  "vm_name": "ns1",
+  "output_directory": "D:\\VMs\\k8s\\ns1\\",
+  "ens33_source": "networking\\ns1.txt",
+  "disk_size": "30720",
+  "disk_additional_size": "61440",
+  "numvcpus": "1",
+  "coresPerSocket": "1",
+  "memsize": "1024"
+}

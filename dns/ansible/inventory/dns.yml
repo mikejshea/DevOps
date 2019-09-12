@@ -1,0 +1,12 @@
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: root
+    ansible_ssh_pass: overwatch
+
+  children:
+    master:
+      hosts:
+        master:
+          ansible_host: 192.168.1.110
+  

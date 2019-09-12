@@ -1,0 +1,35 @@
+---
+# Set up bind
+
+- name: Install bind.
+  yum:
+    name:
+      - bind
+      - bind-utils
+    state: present
+
+- name: Set /etc/named permissions
+  file:
+    path: /etc/named
+    state: directory
+    mode: '0755'
+
+- name: make directories
+  file:
+    path: /etc/named/zones
+    state: directory
+    mode: '0755'
+
+- name: Copy files
+  copy: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+    - { src: 'named.conf', dest: '/etc/named.conf' }
+    - { src: 'named.conf.local', dest: '/etc/named/named.conf.local' }
+    - { src: 'db.phl.example.com', dest: '/etc/named/zones/db.phl.example.com' }
+    - { src: 'db.192.168', dest: '/etc/named/zones/db.192.168' }
+
+- name: Start and Enable named service
+  service:
+    name: named
+    enabled: yes
+    state: started

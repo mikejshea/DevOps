@@ -1,0 +1,81 @@
+{
+  "variables": {
+    "output_directory_base": "D:\\VMs\\prod_eng\\",
+    "vm_name": "prod-eng-1",
+    "output_directory": "{{user `output_directory_base`}}prod-eng-1\\",
+    "disk_size": "81920",
+    "numvcpus": "2",
+    "memsize": "4096",
+    "iso_file": "I:\\ubuntu-18.04.3-server-amd64.iso",
+    "iso_checksum_value": "7d8e0055d663bffa27c1718685085626cb59346e7626ba3d3f476322271f573e",
+    "product_name": "Ubuntu",
+    "product_version": "18.04.3",
+    "product_arch": "amd64",
+    "headless": "false",
+    "ssh_password": "prodeng",
+    "ssh_wait_timeout": "10m",
+    "shutdown_command": "shutdown -P now"
+  },
+  "builders": [
+    {
+      "vm_name": "{{user `vm_name`}}",
+      "vmdk_name": "{{user `vm_name`}}",
+      "type": "vmware-iso",
+      "headless": "{{user `headless`}}",
+      "disk_size": "{{user `disk_size`}}",
+      "disk_type_id": 0,
+      "guest_os_type": "ubuntu-64",
+      "iso_url": "{{user `iso_file`}}",
+      "iso_checksum": "{{user `iso_checksum_value`}}",
+      "iso_checksum_type": "sha256",
+      "output_directory": "{{user `output_directory`}}",
+      "ssh_username": "prodeng",
+      "ssh_password": "{{user `ssh_password`}}",
+      "ssh_wait_timeout": "{{user `ssh_wait_timeout`}}",
+      "shutdown_command": "echo 'prodeng'|sudo -S shutdown -P now",
+      "http_directory": "http",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "2",
+        "memsize": "{{user `memsize`}}",
+        "numvcpus": "{{user `numvcpus`}}",
+        "virtualhw.version": "15"
+      },
+      "vmx_data_post":
+      {
+        "ethernet0.present":"TRUE",
+        "ethernet0.connectionType":"bridged",
+        "ethernet0.virtualDev":"e1000",
+        "ethernet0.wakeOnPcktRcv":"FALSE",
+        "ethernet0.addressType":"generated"
+      },
+      "boot_wait": "10s",
+      "boot_command": [
+        "<esc><f6><esc>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs>",
+        "/install/vmlinuz ",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "debian-installer=en_US auto=true locale=en_US kbd-chooser/method=us ",
+        "console-setup/ask_detect=false keyboard-configuration/layoutcode=us ",
+        "hostname=prod-eng-1 ",
+        "initrd=/install/initrd.gz quiet --- <enter>"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "scripts/init.sh",
+      "execute_command": "echo 'prodeng' | {{.Vars}} sudo -S -E bash '{{.Path}}'"
+    }
+  ],
+  "post-processors": [
+  ]
+}

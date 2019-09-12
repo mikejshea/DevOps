@@ -73,3 +73,11 @@
     daemon_reload: yes
     name: kubelet
     enabled: yes
+
+- name: enable local dns
+  copy:
+    src: resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: u=r,g=r,o=rw

@@ -1,14 +1,12 @@
 {
   "variables": {
-    "output_directory_base": "D:\\VMs\\k8s\\",
-    "use_dns": "dns\\local",
     "iso_file": "D:\\CentOS-7-x86_64-Minimal-1810.iso",
     "iso_checksum_value": "38d5d51d9d100fd73df031ffd6bd8b1297ce24660dc8c13a3b8b4534a4bd291c",
     "product_name": "CentOS",
     "product_version": "7.0.1810",
     "product_arch": "amd64",
     "headless": "false",
-    "ssh_password": "k8suser",
+    "ssh_password": "overwatch",
     "ssh_wait_timeout": "10m",
     "shutdown_command": "shutdown -P now"
   },
@@ -31,7 +29,7 @@
       "shutdown_command": "{{user `shutdown_command`}}",
       "http_directory": "http",
       "vmx_data": {
-        "cpuid.coresPerSocket": "2",
+        "cpuid.coresPerSocket": "{{user `coresPerSocket`}}",
         "memsize": "{{user `memsize`}}",
         "numvcpus": "{{user `numvcpus`}}",
         "virtualhw.version": "15"
@@ -57,21 +55,8 @@
     },
     {
       "type": "shell",
-      "inline": "hostnamectl set-hostname {{ user `vm_name` }}"
-    },
-    {
-      "type": "shell",
       "execute_command": "/bin/sh -x '{{.Path}}'",
       "script": "scripts/provisioning.sh"
-    },
-    {
-      "type": "shell",
-      "inline": "sed -i '/^\\[main\\]/a dns=none' /etc/NetworkManager/NetworkManager.conf"
-    },
-    {
-      "type": "file",
-      "source": "{{user `use_dns`}}",
-      "destination": "/etc/resolv.conf"
     }
   ],
   "post-processors": [

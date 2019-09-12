@@ -1,0 +1,16 @@
+$TTL    604800
+@       IN      SOA     phl.example.com. admin.phl.example.com. (
+                              3         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+; name servers
+      IN      NS      ns1.phl.example.com.
+
+; PTR Records
+110.1   IN      PTR     ns1.phl.example.com.    ; 192.168.1.110
+100.1   IN      PTR     overwatch.phl.example.com.    ; 192.168.1.100
+101.1   IN      PTR     k8s-master.phl.example.com.    ; 192.168.1.101
+102.1   IN      PTR     k8s-node1.phl.example.com.    ; 192.168.1.102
+103.1   IN      PTR     k8s-node2.phl.example.com.    ; 192.168.1.103
