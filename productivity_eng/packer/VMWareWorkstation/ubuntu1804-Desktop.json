@@ -1,9 +1,10 @@
 {
   "variables": {
     "output_directory_base": "D:\\VMs\\prod_eng\\",
-    "vm_name": "prod-eng-1",
-    "output_directory": "{{user `output_directory_base`}}prod-eng-1\\",
-    "disk_size": "81920",
+    "vm_name": "prod-eng-2",
+    "output_directory": "{{user `output_directory_base`}}{{user `vm_name`}}\\",
+    "disk_size": "61440",
+    "disk_additional_size": "61440",
     "numvcpus": "2",
     "memsize": "4096",
     "iso_file": "I:\\ubuntu-18.04.3-server-amd64.iso",
@@ -23,6 +24,7 @@
       "type": "vmware-iso",
       "headless": "{{user `headless`}}",
       "disk_size": "{{user `disk_size`}}",
+      "disk_additional_size": "{{user `disk_additional_size`}}",
       "disk_type_id": 0,
       "guest_os_type": "ubuntu-64",
       "iso_url": "{{user `iso_file`}}",
@@ -64,7 +66,7 @@
         "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
         "debian-installer=en_US auto=true locale=en_US kbd-chooser/method=us ",
         "console-setup/ask_detect=false keyboard-configuration/layoutcode=us ",
-        "hostname=prod-eng-1 ",
+        "hostname={{user `vm_name`}} ",
         "initrd=/install/initrd.gz quiet --- <enter>"
       ]
     }
@@ -73,7 +75,13 @@
     {
       "type": "shell",
       "script": "scripts/init.sh",
+      "environment_vars": ["VOLGROUP={{user `vm_name`}}-vg"],
       "execute_command": "echo 'prodeng' | {{.Vars}} sudo -S -E bash '{{.Path}}'"
+    },
+    {
+      "type": "file",
+      "source": "scripts/dev_setup.sh",
+      "destination": "/data/dev_setup.sh"
     }
   ],
   "post-processors": [

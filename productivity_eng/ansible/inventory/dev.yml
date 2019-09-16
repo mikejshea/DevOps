@@ -1,0 +1,11 @@
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: root
+    ansible_ssh_pass: prodeng
+
+  children:
+    dev_box:
+      hosts:
+        master:
+          ansible_host: localhost

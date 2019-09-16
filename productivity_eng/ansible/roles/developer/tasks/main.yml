@@ -1,0 +1,52 @@
+---
+# Install Devloper Tools
+
+- name: Create a directory for dev tools
+  file:
+    path: "/data/dev_tools/"
+    state: directory
+    mode: '0777'
+
+- name: Add Microsoft .NET Core Prerequisites Repos
+  apt_repository:
+    repo: "deb http://archive.ubuntu.com/ubuntu bionic universe"
+    state: present
+
+- name: Download Microsoft .NET Core
+  get_url:
+    url: "https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb"
+    dest: "/data/dev_tools/packages-microsoft-prod.deb"
+
+- name: Install Microsoft .NET Core
+  apt:
+    deb: "/data/dev_tools/packages-microsoft-prod.deb"
+
+- name: Install Microsoft .NET Core SDK and Prerequisites
+  apt:
+    name: "{{ packages }}"
+    update_cache: yes
+  vars:
+    packages:
+      - apt-transport-https
+      - dotnet-sdk-2.2
+
+- name: Install pip
+  apt:
+    name: "{{ packages }}"
+    update_cache: yes
+  vars:
+    packages:
+      - python-pip
+      - python3-pip
+
+- name: Install Devloper Tools from Snap
+  snap:
+    name: "{{ item.name }}"
+    classic: "{{ item.classic }}"
+  with_items:
+    - {name: postman, classic: no }
+    - {name: atom, classic: yes }
+    - {name: code, classic: yes }
+    - {name: rider, classic: yes }
+    - {name: pycharm-professional, classic: yes }
+    - {name: gnome-system-monitor, classic: no }
